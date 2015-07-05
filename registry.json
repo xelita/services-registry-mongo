@@ -1,0 +1,21 @@
+{
+	"app": "stw",
+	"configs": [
+		{
+			"env": "dev",
+			"data": [
+				{
+					"apiUrl": "http://localhost:1337"
+				}
+			]
+		},
+		{
+			"env": "staging",
+			"data": [
+				{
+					"apiUrl": "http://localhost:1337"
+				}
+			]
+		}
+	]
+}
