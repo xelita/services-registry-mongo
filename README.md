@@ -19,17 +19,67 @@ use registry
 
 ## MongoDB queries
 
+### getApplications
+
+Find all registered applications with their configurations.
+
+
+``` bash
+db.application.find();
+```
+
+### getApplication
+
+Find a registered application with its configurations.
+
+
+``` bash
+db.application.findOne({app: "app"});
+```
+
 ### addApplication
+
+Create a new application with or without configurations.
+
 ``` bash
 db.application.insert({app: "app", configs: "[]"})
 ```
 
 ### updateApplication:
+
+update configurations of an existing application.
+
 ``` bash
 db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
 ```
 
 ### removeApplication:
+
+Remove an existing application.
+
 ``` bash
 db.application.remove({app: "app"}, {justOne: true})
 ```
+### setConfigs:
+
+set configurations to an existing application.
+
+``` bash
+db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
