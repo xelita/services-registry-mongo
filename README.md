@@ -17,7 +17,7 @@ mongo
 use registry
 ```
 
-## MongoDB queries
+## MongoDB queries on application
 
 ### getApplications
 
@@ -68,6 +68,31 @@ set configurations to an existing application.
 db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
 ```
 
+## MongoDB queries on applications configurations
+
+### getConfigs:
+
+Get the configurations of a specific application.
+
+``` bash
+db.application.findOne({app: "app"}, {_id: 0, configs: 1})
+```
+
+### setConfigs:
+
+Set the configurations of a specific application.
+
+``` bash
+db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
+```
+
+### removeConfigs:
+
+Remove the configurations of a specific application.
+
+``` bash
+db.application.update({app: "stw"}, {$set: {configs: []}})
+```
 
 
 
