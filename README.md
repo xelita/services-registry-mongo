@@ -58,7 +58,7 @@ db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUr
 Remove an existing application.
 
 ``` bash
-db.application.remove({app: "app"}, {justOne: true})
+db.application.remove({app: "app"})
 ```
 
 ## MongoDB queries on applications configurations
@@ -76,7 +76,7 @@ db.application.findOne({app: "app"}, {_id: 0, configs: 1})
 Set configurations to a specific application.
 
 ``` bash
-db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
+db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}}, {upsert: true})
 ```
 
 ### removeConfigs:
@@ -94,7 +94,7 @@ db.application.update({app: "app"}, {$set: {configs: []}})
 Get configurations from a specific environment.
 
 ``` bash
-db.application.aggregate([{$unwind: '$configs'}, {$match: {'configs.env': 'dev'}}, {$project: {_id: 0, env: '$configs.env', data: '$configs.data'}}])
+db.application.aggregate([{$unwind: '$configs'}, {$match: {app: 'app', 'configs.env': 'dev'}}, {$project: {_id: 0, env: '$configs.env', data: '$configs.data'}}])
 ```
 
 ### setEnvConfigs
@@ -102,7 +102,8 @@ db.application.aggregate([{$unwind: '$configs'}, {$match: {'configs.env': 'dev'}
 Set configurations to a specific environment.
 
 ``` bash
-db.application.update({app: 'app', 'configs.env': 'dev'}, {$set: {'configs.$': {env: 'dev', data: []}}}, { multi: true})
+db.application.update({app: 'app'}, {$pull: {configs: {env: 'dev'}}})
+db.application.update({app: 'app'}, {$push: {configs: {env: 'dev', data: []}}})
 ```
 
 ### removeEnvConfigs
