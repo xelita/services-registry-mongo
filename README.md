@@ -25,7 +25,7 @@ Find all registered applications with their configurations.
 
 
 ``` bash
-db.application.find();
+db.application.find({}, {_id: 0})
 ```
 
 ### getApplication
@@ -34,20 +34,21 @@ Find a registered application with its configurations.
 
 
 ``` bash
-db.application.findOne({app: "app"});
+db.application.findOne({app: 'app'}, {_id: 0})
 ```
 
 ### addApplication
 
 Create a new application with or without its configurations.
+Update (with 'upsert' set to true) is used instead of usual insert because it avoids to create an application several times.
 
 ``` bash
-db.application.insert({app: "app", configs: "[]"})
+db.application.update({app: 'app'}, {app: 'app', configs: '[]''}, {upsert: true})
 ```
 
 ### updateApplication:
 
-update the configurations of an existing application.
+Update the configurations of an existing application.
 
 ``` bash
 db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
@@ -73,10 +74,10 @@ db.application.findOne({app: "app"}, {_id: 0, configs: 1})
 
 ### setConfigs:
 
-Set configurations to a specific application.
+Set configurations to an existing application.
 
 ``` bash
-db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}}, {upsert: true})
+db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
 ```
 
 ### removeConfigs:
