@@ -115,8 +115,15 @@ Remove the registered configurations from a specific environment.
 db.application.update({app: 'app', 'configs.env': 'dev'}, {$pull: {configs: {env: 'dev'}}})
 ```
 
+## MongoDB queries on environment configuration values
 
+### getEnvConfig:
 
+Get the configuration value from a configuration key.
+
+``` bash
+db.application.aggregate([{$unwind: '$configs'}, {$unwind: '$configs.data'}, {$match: {app: 'stw', 'configs.env': 'dev', 'configs.data.apiUrl': {$exists: true}}}, {$project: {_id: 0, 'apiUrl': '$configs.data.apiUrl'}}])
+```
 
 
 
