@@ -23,7 +23,6 @@ use registry
 
 Find all registered applications with their configurations.
 
-
 ``` bash
 db.application.find({}, {_id: 0})
 ```
@@ -51,7 +50,9 @@ db.application.update({app: 'app'}, {app: 'app', configs: '[]''}, {upsert: true}
 Update the configurations of an existing application.
 
 ``` bash
-db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
+db.application.update(
+   {app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}}
+)
 ```
 
 ### removeApplication:
@@ -77,7 +78,10 @@ db.application.findOne({app: "app"}, {_id: 0, configs: 1})
 Set configurations to an existing application.
 
 ``` bash
-db.application.update({app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}})
+db.application.update(
+   {app: "app"}, 
+   {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}}
+)
 ```
 
 ### removeConfigs:
@@ -92,10 +96,14 @@ db.application.update({app: "app"}, {$set: {configs: []}})
 
 ### getEnvConfigs:
 
-Get configurations from a specific environment.
+Get the configurations registered to a specific environment.
 
 ``` bash
-db.application.aggregate([{$unwind: '$configs'}, {$match: {app: 'app', 'configs.env': 'dev'}}, {$project: {_id: 0, env: '$configs.env', data: '$configs.data'}}])
+db.application.aggregate([
+   {$unwind: '$configs'}, 
+   {$match: {app: 'app', 'configs.env': 'dev'}}, 
+   {$project: {_id: 0, env: '$configs.env', data: '$configs.data'}}
+])
 ```
 
 ### setEnvConfigs
@@ -109,20 +117,28 @@ db.application.update({app: 'app'}, {$push: {configs: {env: 'dev', data: []}}})
 
 ### removeEnvConfigs
 
-Remove the registered configurations from a specific environment.
+Remove the configurations registered to a specific environment.
 
 ``` bash
-db.application.update({app: 'app', 'configs.env': 'dev'}, {$pull: {configs: {env: 'dev'}}})
+db.application.update(
+   {app: 'app', 'configs.env': 'dev'}, 
+   {$pull: {configs: {env: 'dev'}}}
+)
 ```
 
 ## MongoDB queries on environment configuration values
 
 ### getEnvConfig:
 
-Get the configuration value from a configuration key.
+Get the configuration value set for a configuration key.
 
 ``` bash
-db.application.aggregate([{$unwind: '$configs'}, {$unwind: '$configs.data'}, {$match: {app: 'stw', 'configs.env': 'dev', 'configs.data.apiUrl': {$exists: true}}}, {$project: {_id: 0, 'apiUrl': '$configs.data.apiUrl'}}])
+db.application.aggregate([
+   {$unwind: '$configs'}, 
+   {$unwind: '$configs.data'}, 
+   {$match: {app: 'stw', 'configs.env': 'dev', 'configs.data.apiUrl': {$exists: true}}}, 
+   {$project: {_id: 0, 'apiUrl': '$configs.data.apiUrl'}}
+])
 ```
 
 
