@@ -8,88 +8,66 @@ mongod --dbpath /Users/Benjamin/Documents/dev/projects/sources/xelita/github/ser
 
 ## Import data in the application collection
 ``` bash
-mongoimport --db registry -c application --file registry.json 
+mongoimport --db registry -c application --file registry.json --jsonArray 
+```
+
+The structure of a document is the following:
+``` bash
+[
+   {
+      "app": "stw",
+      "env": "dev",
+      "key": "apiUrl",
+      "value": "http://localhost:1337"
+   },
+   {
+      "app": "stw",
+      "env": "dev",
+      "key": "appToken",
+      "value": "ssk%2')*e"
+   },
+   {
+      "app": "stw",
+      "env": "staging",
+      "key": "apiUrl",
+      "value": "http://localhost:1337"
+   },
+]
 ```
 
 ## Launch the mongo shell
 ``` bash
-mongo
-use registry
+mongo registry
 ```
 
-## MongoDB queries on application
+## MongoDB queries on application configurations
 
-### getApplications
+### getAppConfigs
 
-Find all registered applications with their configurations.
-
-``` bash
-db.application.find({}, {_id: 0})
-```
-
-### getApplication
-
-Find a registered application with its configurations.
+Find all configurations of a specific application.
 
 
 ``` bash
-db.application.findOne({app: 'app'}, {_id: 0})
+db.application.aggregate([
+   {$match: {app: app}},
+   {$group: {_id: '$env', configs: {$push: {key: '$key', value: '$value'}}}},
+   {$project: {_id: 0, env: '$_id', configs: 1}}
+])
 ```
 
-### addApplication
+### setAppConfigs
 
-Create a new application with or without its configurations.
-Update (with 'upsert' set to true) is used instead of usual insert because it avoids to create an application several times.
+Set application configurations (removing the existing ones).
 
 ``` bash
-db.application.update({app: 'app'}, {app: 'app', configs: '[]''}, {upsert: true})
 ```
 
-### updateApplication:
+### removeAppConfigs:
 
-Update the configurations of an existing application.
-
-``` bash
-db.application.update(
-   {app: "app"}, {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}}
-)
-```
-
-### removeApplication:
-
-Remove an existing application.
+Remove all configurations that belong to an application.
 
 ``` bash
 db.application.remove({app: "app"})
-```
-
-## MongoDB queries on applications configurations
-
-### getConfigs:
-
-Get the configurations of a specific application.
-
-``` bash
-db.application.findOne({app: "app"}, {_id: 0, configs: 1})
-```
-
-### setConfigs:
-
-Set configurations to an existing application.
-
-``` bash
-db.application.update(
-   {app: "app"}, 
-   {$set: {configs: [{env: "dev", data: [{apiUrl: "http://localhost:1337/api/v3"}]}]}}
-)
-```
-
-### removeConfigs:
-
-Remove configurations from a specific application.
-
-``` bash
-db.application.update({app: "app"}, {$set: {configs: []}})
 ```
 
 ## MongoDB queries on applications configurations targetting a specific environment
@@ -99,11 +77,7 @@ db.application.update({app: "app"}, {$set: {configs: []}})
 Get the configurations registered to a specific environment.
 
 ``` bash
-db.application.aggregate([
-   {$unwind: '$configs'}, 
-   {$match: {app: 'app', 'configs.env': 'dev'}}, 
-   {$project: {_id: 0, env: '$configs.env', data: '$configs.data'}}
-])
+db.application.find({app: app, env: env}, {_id: 0, app: 0, env: 0})
 ```
 
 ### setEnvConfigs
@@ -111,8 +85,6 @@ db.application.aggregate([
 Set configurations to a specific environment.
 
 ``` bash
-db.application.update({app: 'app'}, {$pull: {configs: {env: 'dev'}}})
-db.application.update({app: 'app'}, {$push: {configs: {env: 'dev', data: []}}})
 ```
 
 ### removeEnvConfigs
@@ -120,29 +92,33 @@ db.application.update({app: 'app'}, {$push: {configs: {env: 'dev', data: []}}})
 Remove the configurations registered to a specific environment.
 
 ``` bash
-db.application.update(
-   {app: 'app', 'configs.env': 'dev'}, 
-   {$pull: {configs: {env: 'dev'}}}
-)
+db.application.remove({app: app, env: env})
 ```
 
 ## MongoDB queries on environment configuration values
 
-### getEnvConfig:
+### getConfig:
 
 Get the configuration value set for a configuration key.
 
 ``` bash
-db.application.aggregate([
-   {$unwind: '$configs'}, 
-   {$unwind: '$configs.data'}, 
-   {$match: {app: 'stw', 'configs.env': 'dev', 'configs.data.apiUrl': {$exists: true}}}, 
-   {$project: {_id: 0, 'apiUrl': '$configs.data.apiUrl'}}
-])
+db.application.findOne({app: app, env: env, key: key}, {_id: 0, app: 0, env: 0, key: 0});
 ```
 
+### setConfig:
 
+Set a configuration key to an application environment.
 
+``` bash
+db.application.update({app: app, env: env, key: key}, {app: app, env: env, key: key, value: value}, {upsert: true})```
+
+### removeConfig:
+
+Remove a configuration key from the configurations list.
+
+``` bash
+db.application.remove({app: app, env: env, key: key});
+```
 
 
 

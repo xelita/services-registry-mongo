@@ -1,21 +1,20 @@
-{
-	"app": "stw",
-	"configs": [
-		{
-			"env": "dev",
-			"data": [
-				{
-					"apiUrl": "http://localhost:1337"
-				}
-			]
-		},
-		{
-			"env": "staging",
-			"data": [
-				{
-					"apiUrl": "http://localhost:1337"
-				}
-			]
-		}
-	]
-}
+[
+	{
+		"app": "stw",
+		"env": "dev",
+		"key": "apiUrl",
+		"value": "http://localhost:1337"
+	},
+	{
+		"app": "stw",
+		"env": "dev",
+		"key": "appToken",
+		"value": "ssk%2')*e"
+	},
+	{
+		"app": "stw",
+		"env": "staging",
+		"key": "apiUrl",
+		"value": "http://localhost:1337"
+	}
+]
